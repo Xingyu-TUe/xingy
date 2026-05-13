@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>则形 3D｜机械设计行业的 AI 智能体</title>
+  <style>
+    :root {
+      --bg: #07090b;
+      --panel: rgba(48, 52, 60, 0.92);
+      --panel-soft: rgba(58, 62, 70, 0.78);
+      --text: #f8fbff;
+      --muted: #8e9aa9;
+      --blue: #0b91ff;
+      --cyan: #20d5ff;
+      --line: rgba(255, 255, 255, 0.055);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 50% 13%, rgba(0, 153, 255, 0.14), transparent 18rem),
+        radial-gradient(circle at 8% 60%, rgba(0, 169, 255, 0.16), transparent 20rem),
+        radial-gradient(circle at 92% 58%, rgba(15, 144, 255, 0.13), transparent 22rem),
+        var(--bg);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 76px 76px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.92), rgba(0,0,0,0.45));
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(0,0,0,0.75), transparent 28%, transparent 72%, rgba(0,0,0,0.72));
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(960px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 46px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(7, 10, 12, 0.82);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--blue);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .logo span:last-child {
+      color: var(--cyan);
+      font-size: 0.72em;
+      letter-spacing: -0.06em;
+      transform: translateY(-1px);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 34px;
+      color: #8995a7;
+      font-size: 12px;
+    }
+
+    .nav-actions { display: flex; gap: 12px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 6px;
+      padding: 9px 18px;
+      color: #eef7ff;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.02);
+      transition: transform .2s, border-color .2s, background .2s;
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: rgba(11,145,255,.7); }
+
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, #00b7ff, #0077ff);
+      box-shadow: 0 10px 30px rgba(0, 132, 255, 0.3);
+    }
+
+    .btn.pill { border-radius: 999px; color: var(--cyan); background: rgba(0,155,255,0.07); }
+
+    .hero {
+      min-height: 510px;
+      padding: 98px 0 50px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(42px, 7.8vw, 74px);
+      line-height: 1.14;
+      font-weight: 950;
+      letter-spacing: -0.075em;
+    }
+
+    .accent { color: var(--blue); text-shadow: 0 0 24px rgba(0,142,255,.35); }
+
+    .hero p,
+    .section-head p,
+    .final p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .hero p { margin: 22px 0 26px; }
+
+    .feature-pills {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 34px;
+    }
+
+    .hero .primary { border-radius: 8px; padding: 14px 26px; font-size: 14px; }
+
+    .demo-wrap {
+      position: relative;
+      margin-top: 86px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .demo-wrap::before {
+      content: "";
+      position: absolute;
+      width: min(840px, 85vw);
+      height: 140px;
+      top: -34px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, rgba(142,76,255,.65), rgba(0,181,255,.7), rgba(47,255,149,.65));
+      filter: blur(22px);
+      opacity: .7;
+    }
+
+    .demo {
+      position: relative;
+      width: min(790px, 92vw);
+      height: 420px;
+      border: 1px solid rgba(180, 210, 255, 0.35);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #32343f;
+      box-shadow: 0 38px 100px rgba(0,0,0,.5);
+    }
+
+    .window-dot {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      width: 86px;
+      height: 18px;
+      border-radius: 20px;
+      background: rgba(0,0,0,.22);
+      color: #c8d6e7;
+      font-size: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-box {
+      position: absolute;
+      left: 50%;
+      top: 51%;
+      width: 278px;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .bot {
+      margin: 0 auto 10px;
+      width: 38px;
+      height: 28px;
+      border-radius: 14px 14px 10px 10px;
+      background: linear-gradient(#c8edff, #6caeff);
+      position: relative;
+    }
+
+    .bot::before,
+    .bot::after {
+      content: "";
+      position: absolute;
+      top: 12px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #1959ae;
+    }
+
+    .bot::before { left: 10px; }
+    .bot::after { right: 10px; }
+
+    .chat-box strong { display: block; font-size: 13px; margin-bottom: 2px; }
+    .chat-box span { color: #aab5c5; font-size: 8px; }
+
+    .prompt {
+      margin-top: 14px;
+      height: 70px;
+      border: 1px solid rgba(30,118,255,.75);
+      border-radius: 5px;
+      background: #171a25;
+      text-align: left;
+      padding: 10px;
+      color: #cbd6e6;
+      font-size: 8px;
+    }
+
+    .send {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #66bbff, #3157ff);
+    }
+
+    section { padding: 82px 0; }
+
+    .section-head { text-align: center; margin-bottom: 46px; }
+    .section-head h2,
+    .final h2 {
+      margin: 0 0 14px;
+      font-size: clamp(31px, 5vw, 44px);
+      line-height: 1.18;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .case-card {
+      min-height: 262px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #2e3035;
+      display: grid;
+      grid-template-columns: 46% 54%;
+    }
+
+    .illustration {
+      position: relative;
+      background: linear-gradient(135deg, #ffb900 0 58%, #2c3036 58%);
+      overflow: hidden;
+    }
+
+    .illustration.alt { background: linear-gradient(90deg, #f0c23e 0 52%, #2e3035 52%); }
+    .sun { position: absolute; top: 36px; left: 66px; width: 68px; height: 68px; border-radius: 50%; background: #ff9f00; box-shadow: 0 0 0 12px rgba(255,159,0,.2); }
+    .desk { position: absolute; bottom: 55px; left: 38px; width: 145px; height: 12px; background: #292b31; transform: rotate(7deg); }
+    .person { position: absolute; bottom: 67px; left: 76px; width: 32px; height: 68px; border-radius: 18px 18px 4px 4px; background: #101217; transform: rotate(-20deg); }
+    .person::before { content:""; position:absolute; top:-18px; left:5px; width:22px; height:22px; border-radius:50%; background:#ffdfbd; }
+    .chair { position:absolute; bottom: 49px; left: 74px; width: 78px; height: 86px; border-left: 10px solid #17191f; border-bottom: 9px solid #17191f; border-radius: 0 0 0 35px; }
+    .music { position:absolute; color:#d50a32; font-size:24px; font-weight:900; transform:rotate(-25deg); }
+    .music:nth-child(1){ top:50px; left:96px; } .music:nth-child(2){ top:85px; left:134px; } .music:nth-child(3){ top:122px; left:82px; }
+
+    .case-copy { padding: 48px 36px; }
+    .quote { color: white; font-size: 21px; line-height: 1.35; font-weight: 900; margin-bottom: 30px; }
+    .case-copy h3 { margin: 0 0 16px; color: #ffd42d; font-size: 16px; }
+    .case-copy p { margin: 0; color: #a8b0bd; font-size: 12px; line-height: 1.75; }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 338px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(77, 83, 91, 0.6);
+    }
+
+    .steps { background: rgba(10, 12, 15, .18); }
+    .step { padding: 26px 22px; border-radius: 14px; color: #d8e2ee; }
+    .step.active { background: rgba(77, 80, 86, .95); }
+    .step strong { display: flex; gap: 11px; font-size: 13px; }
+    .step b { display: inline-grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; background: rgba(255,255,255,.12); font-size: 11px; }
+    .step p { margin: 14px 0 0 32px; color: #a6b0be; font-size: 11px; line-height: 1.7; }
+    .workflow-preview { background: linear-gradient(135deg, rgba(104,119,128,.52), rgba(63,64,65,.35)); }
+
+    .asset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 164px 164px;
+      gap: 8px;
+    }
+
+    .asset-card, .evolve-card {
+      border-radius: 12px;
+      padding: 28px;
+      background: rgba(68, 70, 73, .9);
+      color: #dbe5ef;
+    }
+
+    .asset-card.tall { grid-row: span 2; }
+    .asset-card h3, .evolve-card h3 { margin: 0 0 12px; color: white; font-size: 17px; }
+    .asset-card p, .evolve-card p { margin: 0; color: #a6b0bd; font-size: 11px; line-height: 1.8; }
+
+    .evolve-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .evolve-card { min-height: 270px; padding-top: 48px; text-align: center; }
+    .evolve-card h3 { font-size: 20px; }
+
+    .final { padding: 96px 0 110px; text-align: center; }
+    .final textarea {
+      width: min(470px, 90vw);
+      height: 150px;
+      margin: 30px auto 26px;
+      display: block;
+      resize: none;
+      border: 1px solid rgba(31, 124, 255, .95);
+      border-radius: 8px;
+      background: #1a1e2b;
+      color: #dce8f8;
+      padding: 22px;
+      outline: none;
+      box-shadow: 0 0 38px rgba(10, 126, 255, .08);
+    }
+
+    footer {
+      background: #1a1a1b;
+      border-top: 1px solid rgba(255,255,255,.05);
+      padding: 64px 0 78px;
+      color: #8d96a5;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 3fr 1.25fr;
+      gap: 54px;
+    }
+
+    .footer-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+    footer h4 { color: white; margin: 0 0 20px; font-size: 12px; }
+    footer a, footer p { display: block; margin: 0 0 12px; font-size: 11px; color: #7f8794; }
+    .divider { border-left: 1px solid rgba(255,255,255,.07); padding-left: 54px; }
+    .qr-row { display: flex; gap: 16px; margin-top: 48px; }
+    .qr { width: 70px; height: 70px; background: repeating-linear-gradient(45deg, #f4f7fb 0 5px, #1b1e24 5px 9px); border: 7px solid #eef2f7; }
+    .copyright { margin-top: 78px; font-size: 10px; }
+
+    @media (max-width: 760px) {
+      .nav { padding: 0 16px; }
+      .nav-links { display: none; }
+      .hero { padding-top: 74px; }
+      .demo { height: 320px; }
+      .case-grid, .evolve-grid, .footer-grid { grid-template-columns: 1fr; }
+      .case-card { grid-template-columns: 1fr; }
+      .illustration { min-height: 210px; }
+      .workflow { grid-template-columns: 1fr; }
+      .asset-grid { grid-template-columns: 1fr; grid-template-rows: none; }
+      .asset-card.tall { grid-row: auto; }
+      .divider { border-left: 0; padding-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="主导航">
+      <a class="logo" href="#"><span>DOX</span><span>则形</span></a>
+      <div class="nav-links">
+        <a href="#users">首页</a>
+        <a href="#workflow">产品功能</a>
+        <a href="#assets">案例</a>
+        <a href="#evolve">服务</a>
+        <a href="#contact">关于我们</a>
+      </div>
+      <div class="nav-actions">
+        <a class="btn" href="#contact">登录</a>
+        <a class="btn primary" href="#contact">立即体验</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <h1><span class="accent">则形™3D</span><br>机械设计行业的<span class="accent">AI智能体</span></h1>
+      <p>会图纸标准和设计意图的数字人，输入需求，分钟生成全套三维模型</p>
+      <div class="feature-pills">
+        <span class="btn pill">◆ 感知需求表达</span>
+        <span class="btn pill">◆ 主动开箱推荐</span>
+        <span class="btn pill">◆ 交互式迭代</span>
+      </div>
+      <a class="btn primary" href="#contact">首发试用 立即体验</a>
+      <div class="demo-wrap" aria-label="AI 对话演示窗口">
+        <div class="demo">
+          <div class="window-dot">SEAMLESS_3D</div>
+          <div class="chat-box">
+            <div class="bot"></div>
+            <strong>你好，我是你的AI</strong>
+            <span>我是上辊式矫平机专家，请描述一个需求</span>
+            <div class="prompt">请帮我生成一套...</div>
+            <div class="send"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="users" class="container">
+      <div class="section-head">
+        <h2>谁能使用则形获得<span class="accent">效率飞跃？</span></h2>
+        <p>无论你是图纸方案引入，还是跨部门协同人，则形3D都能帮助你直达成效</p>
+      </div>
+      <div class="case-grid">
+        <article class="case-card">
+          <div class="illustration"><span class="sun"></span><span class="desk"></span><span class="person"></span></div>
+          <div class="case-copy">
+            <div class="quote">“重复劳动耗时，工具一压再压”</div>
+            <h3>专业设计师 & 工程师</h3>
+            <p>从初始建模、参数化和方案迭代中释放时间，把注意力聚焦在方案判断和创新设计。</p>
+          </div>
+        </article>
+        <article class="case-card">
+          <div class="illustration alt"><span class="music">♪</span><span class="music">♪</span><span class="music">♪</span><span class="chair"></span></div>
+          <div class="case-copy">
+            <div class="quote">“方案迟迟不出，决策无人推进”</div>
+            <h3>设计需求方 & 甲方</h3>
+            <p>用自然语言提出诉求，快速得到可讨论的三维方案，让沟通从概念进入可视成果。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="workflow" class="container">
+      <div class="section-head">
+        <h2><span class="accent">一次对话</span>，从工作到夹具</h2>
+        <p>上传一个主体 + 可调一个空间，全程由 AI 介入，每一步都可以用自然语言控制</p>
+      </div>
+      <div class="workflow">
+        <div class="steps">
+          <div class="step active"><strong><b>1</b>上传工件与工艺信息</strong><p>只需上传基础模型和关键尺寸需求，AI会自动理解零件特征，为后续设计准备。</p></div>
+          <div class="step"><strong><b>2</b>一键生成初版方案</strong></div>
+          <div class="step"><strong><b>3</b>多轮对话，灵活调整</strong></div>
+          <div class="step"><strong><b>4</b>输出完整方案成果</strong></div>
+        </div>
+        <div class="workflow-preview"></div>
+      </div>
+    </section>
+
+    <section id="assets" class="container">
+      <div class="section-head">
+        <h2>让优秀设计，成为<span class="accent">企业资产</span></h2>
+        <p>每个人经验、成熟方案与项目流程，系统沉淀为企业级的数字知识库与协作平台</p>
+      </div>
+      <div class="asset-grid">
+        <article class="asset-card"><h3>开箱即用，海量标准</h3><p>内置机械行业常用标准件库、设计规则与典型建模流程。</p></article>
+        <article class="asset-card"><h3>清晰的成员与项目管理</h3><p>任务记录形成项目知识链，协同更高效。</p></article>
+        <article class="asset-card tall"><h3>新项目一键复用</h3><p>调用已有方案与经验，快速启动新的机械设计需求。</p></article>
+        <article class="asset-card"><h3>统一设计规范</h3><p>沉淀企业标准，保证团队输出一致。</p></article>
+        <article class="asset-card"><h3>沉淀企业专属知识</h3><p>将设计经验、历史方案和工程判断，转化为可复用资产。</p></article>
+      </div>
+    </section>
+
+    <section id="evolve" class="container">
+      <div class="section-head">
+        <h2>不止于工具，<span class="accent">持续进化</span></h2>
+        <p>我们不断拓展设计场景与智能能力，让AI真正成为你的流程中枢和超级帮手</p>
+      </div>
+      <div class="evolve-grid">
+        <article class="evolve-card"><h3>场景多元化</h3><p>从夹具夹治具设计出发，逐步覆盖机加、装配、钣金等更多垂直场景。</p></article>
+        <article class="evolve-card"><h3>能力可扩展</h3><p>推出用户自定义技能，支持对接私有知识库及工具调用的 “AI Skill”。</p></article>
+        <article class="evolve-card"><h3>模型自进化</h3><p>基于使用反馈，持续优化专业垂直AI模型，实现“越用越懂你”。</p></article>
+      </div>
+    </section>
+
+    <section id="contact" class="final container">
+      <h2>开启<span class="accent">AI</span>驱动的新一代设计</h2>
+      <p>云端开放前期，想试用请留下人为体验</p>
+      <textarea aria-label="试用申请" placeholder="请帮我上传工件图"></textarea>
+      <a class="btn primary" href="mailto:contact@example.com">首发试用 立即体验</a>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <a class="logo" href="#"><span>DOX</span><span>则形</span></a>
+        <p class="copyright">Copyright 2026 Design Order 版权所有</p>
+      </div>
+      <div class="footer-links">
+        <div><h4>产品动态</h4><a href="#">则形3D</a><a href="#">案例3D</a><a href="#">机构与标准</a></div>
+        <div><h4>案例</h4><a href="#">模具设计</a><a href="#">夹治具设计</a><a href="#">平台服务</a></div>
+        <div><h4>服务</h4><a href="#">需求咨询</a><a href="#">线上演示</a><a href="#">产业学院</a></div>
+        <div><h4>关于我们</h4><a href="#">公司简介</a><a href="#">联系我们</a><a href="#">加入我们</a></div>
+      </div>
+      <div class="divider">
+        <h4>联系我们</h4>
+        <p>商务合作：zhixing@example.com</p>
+        <p>地址：上海市智能制造创新中心</p>
+        <p>电话：021-9999-0000</p>
+        <div class="qr-row"><div><div class="qr"></div><p>公众号</p></div><div><div class="qr"></div><p>技术交流</p></div></div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
